@@ -1,12 +1,15 @@
 """
 Author: Angad Gill, Wei-Tsung Lin
 """
+import os
 import time
 import json
 import sklearn_lite as preprocessing
 from utils import *
 from database import *
 from sf_kmeans import sf_kmeans
+
+S3_BUCKET = os.environ['S3_BUCKET']
 
 def lambda_handler(event, context):
     message = event['Records'][0]['Sns']['Message']
@@ -76,7 +79,7 @@ def work_task(job_id, task_id, k, covar_type, covar_tied, n_init, s3_file_key, c
         print('job_id:{}, task_id:{}'.format(job_id, task_id))
         start_time = time.time()
         start_read_time = time.time()
-        data, attr = read_from_s3(job_id, task_id, s3_file_key)
+        data, attr = read_from_s3(job_id, task_id, S3_BUCKET, s3_file_key)
         elapsed_read_time = time.time() - start_read_time
 
         start_processing_time = time.time()

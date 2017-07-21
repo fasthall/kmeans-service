@@ -7,7 +7,6 @@ import os
 import csv
 import boto3
 import shutil
-from config import S3_BUCKET
 
 def float_to_str(num):
     """
@@ -36,12 +35,12 @@ def read_csv(fname):
             data.append(tmp)
     return data, attr
 
-def read_from_s3(job_id, task_id, s3_file_key):
+def read_from_s3(job_id, task_id, bucket, key):
     path = '/tmp/' + str(job_id) + '/' + str(task_id)
     shutil.rmtree(path, ignore_errors=True)
     os.makedirs(path)
     s3 = boto3.client('s3')
-    s3.download_file(S3_BUCKET, s3_file_key, path + '/data.csv')
+    s3.download_file(bucket, key, path + '/data.csv')
     return read_csv(path + '/data.csv')
 
 def col_select(data, attr, columns):

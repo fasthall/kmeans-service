@@ -1,6 +1,9 @@
+import os
 import json
 import boto3
 from utils import *
+
+SNS_TOPIC_ARN = os.environ['SNS_TOPIC_ARN']
 
 def lambda_handler(event, context):
     client = boto3.client('sns')
@@ -8,7 +11,7 @@ def lambda_handler(event, context):
         if record['eventName'] == 'INSERT':
             jsonobj = unmarshalDynamoJson(record['dynamodb']['NewImage'])
             response = client.publish(
-                TopicArn='arn:aws:sns:us-west-2:185174815983:kmeansservice',
+                TopicArn=SNS_TOPIC_ARN,
                 Message=json.dumps(jsonobj)
             )
             print(response)

@@ -3,10 +3,12 @@ Wrapper function for DynamoDB.
 
 Author: Angad Gill, Wei-Tsung Lin
 """
+import os
 import time
 import uuid
 import boto3
-from config import DYNAMO_DBNAME
+
+DYNAMO_DBNAME = os.environ['DYNAMO_DBNAME']
 
 def dynamo_no_context_add_tasks(tasks):
     """
