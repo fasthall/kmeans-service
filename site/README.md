@@ -6,7 +6,16 @@ Author: Angad Gill, Wei-Tsung Lin
 ## Deploy
 
 ### Build zip files
+
+**DISCLAMIER** This application uses part of `sklearn`. Because putting all required libraries into zip file may exceed AWS Lambda's limit, so the necessary functions in sklearn is moved to sklearn_lite.py. The package is distributed under 3-Clause BSD license.
+
+    $ virtualenv venv --python=python3
+    $ source venv/bin/activate
+    (venv) $ pip install --no-binary --no-compile scipy==0.19.0
+    (venv) $ pip install --no-binary --no-compile numpy==1.12.1
     $ sh build_zip.sh
+If your virtualenv's packages location is not `venv/lib/python3.6/site-packages/`, remember to change it in `build_zip.sh`.
+
 You will get 3 zip files: `create_job.zip`, `fetch_tasks.zip`, and `worker.zip`.
 
 ### Create S3 bucket

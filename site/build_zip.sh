@@ -14,6 +14,6 @@ echo 'fetch_tasks.lambda_handler'
 # worker.lambda_handler
 rm -f worker.zip
 zip -r9 worker.zip worker.py sklearn_lite.py database.py utils.py sf_kmeans/sf_kmeans.py
-cd pkgs
-zip -ur ../worker.zip scipy/ numpy/
+cd venv/lib/python3.6/site-packages/
+zip -ur ../../../../worker.zip scipy/ numpy/
 echo 'worker.lambda_handler'
