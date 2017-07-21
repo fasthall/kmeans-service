@@ -9,9 +9,7 @@ Authors: Nevena Golubovic, Angad Gill
 import numpy as np
 from numpy.linalg import LinAlgError
 from scipy.spatial.distance import cdist
-from sklearn.utils.extmath import squared_norm
-from sklearn.cluster import k_means_
-
+from sklearn_lite import squared_norm, _init_centroids
 
 class SF_KMeans(object):
     def __init__(self, n_clusters=2, max_iter=300, tol=0.0001, verbose=0, n_init=10,
@@ -104,7 +102,7 @@ class SF_KMeans(object):
 
         """ Initial assignment """
         if self.cluster_centers_ is None:
-            self.cluster_centers_ = k_means_._init_centroids(data, self.n_clusters, 'k-means++')
+            self.cluster_centers_ = _init_centroids(data, self.n_clusters, 'k-means++')
             for k in range(self.n_clusters):
                 k_dist = cdist(data, np.array([self.cluster_centers_[k]]), metric='euclidean')
                 distances[:, k] = k_dist.reshape((data.shape[0],))
