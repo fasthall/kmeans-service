@@ -30,3 +30,13 @@ current_path=$PWD
 cd $pkgs
 zip -ur $current_path/report.zip pandas/ pytz/ numpy/
 cd $current_path
+echo 'report.lambda_handler'
+
+# plot.lambda_handler
+rm -f plot.zip
+zip -r9 plot.zip plot.py utils.py database.py
+current_path=$PWD
+cd $pkgs
+zip -ur $current_path/plot.zip pandas/ pytz/ numpy/ matplotlib/ seaborn/ pyparsing.py cycler.py
+cd $current_path
+echo 'plot.lambda_handler'

@@ -3,6 +3,9 @@ This is the AWS Lambda port of Centaurus.
 
 Author: Angad Gill, Wei-Tsung Lin
 
+## TODO
+The libraries plot needs are too large and can't fit in a single zip file that AWS Lambda accepts.
+
 ## Deploy
 
 ### Build zip files
@@ -22,7 +25,7 @@ You will get 3 zip files: `create_job.zip`, `fetch_tasks.zip`, and `worker.zip`.
 ![Create S3 bucket](doc/1.png)
 
 ### Upload zip files to S3 bucket
-Upload `worker.zip` and `report.zip` to S3 bucket
+Upload `worker.zip`, `report.zip` and `plot.zip` to S3 bucket
 ![Upload zip files to S3 bucket](doc/2.png)
 
 ### Create SNS topic
@@ -73,6 +76,18 @@ Upload `report.zip` as source code.
 Consider to increase the timeout to avoid lambda function not able to finish the task.
 
 ![report](doc/10.png)
+
+Use `plot.zip` in S3 bucket as source code.
+
+* S3 link URL: plot.zip's link in S3 bucket
+* Runtime: Python 3.6
+* Environment variables: {"DYNAMO_DBNAME": "*your dynamoDB table name*", "S3_BUCKET": "*your S3 bucket name*"}
+* Handler: plot.lambda_handler
+* Role: A role can read from S3 and write to DynamoDB
+
+Also, in advanced settings increase the timeout to avoid lambda function not able to finish the task.
+
+![report](doc/11.png)
 
 ## Test
 

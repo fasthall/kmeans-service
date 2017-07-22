@@ -24,7 +24,26 @@ def read_from_s3_pd(job_id, task_id, bucket, key):
     s3.download_file(bucket, key, path + '/data.csv')
     return pd.read_csv(path + '/data.csv')
 
-def plot_aic_bic(job_id, min_members=None):
+def write_to_local(data, job_id, file, onLambda=True):
+    if onLambda:
+        path = '/tmp/' + str(job_id) + '/'
+        os.makedirs(path)
+    else:
+        path = './imgs/'
+        if not os.path.exists(path):
+            os.makedirs(path)
+    with open(path + file, 'wb') as ofile:
+        ofile.write(data)
+
+def write_to_s3(job_id, bucket, file, onLambda=True):
+    if onLambda:
+        path = '/tmp/' + str(job_id) + '/'
+    else:
+        path = './imgs/'
+    s3 = boto3.client('s3')
+    s3.upload_file(path + file, bucket, job_id + '/' + file)
+
+def plot_aic_bic(job_id, min_members=None, onLambda=True):
     """
     Generate the AIC-BIC plot as a PNG
     Parameters
@@ -42,11 +61,11 @@ def plot_aic_bic(job_id, min_members=None):
     fig = plot_aic_bic_fig(tasks)
     aic_bic_plot = fig_to_png(fig)
     response = aic_bic_plot.getvalue()
-    with open('aic_bic_plot.png', 'wb') as ofile:
-        ofile.write(response)
+    write_to_local(response, job_id, 'aic_bic_plot.png', onLambda)
+    write_to_s3(job_id, S3_BUCKET, 'aic_bic_plot.png', onLambda)
     return response
 
-def plot_count(job_id, min_members=None):
+def plot_count(job_id, min_members=None, onLambda=True):
     """
     Generate the Count plot as a PNG
     Parameters
@@ -64,11 +83,11 @@ def plot_count(job_id, min_members=None):
     fig = plot_count_fig(tasks)
     count_plot = fig_to_png(fig)
     response = count_plot.getvalue()
-    with open('count_plot.png', 'wb') as ofile:
-        ofile.write(response)
+    write_to_local(response, job_id, 'count_plot.png', onLambda)
+    write_to_s3(job_id, S3_BUCKET, 'count_plot.png', onLambda)
     return response
 
-def plot_cluster(job_id, x_axis, y_axis, show_ticks, min_members=None):
+def plot_cluster(job_id, x_axis, y_axis, show_ticks, min_members=None, onLambda=True):
     """
     Generate the Cluster plot as a PNG
     Parameters
@@ -93,11 +112,11 @@ def plot_cluster(job_id, x_axis, y_axis, show_ticks, min_members=None):
     fig = plot_cluster_fig(data, viz_columns, zip(covar_types, covar_tieds, labels, ks, bics), show_ticks)
     cluster_plot = fig_to_png(fig)
     response = cluster_plot.getvalue()
-    with open('cluster_plot.png', 'wb') as ofile:
-        ofile.write(response)
+    write_to_local(response, job_id, 'cluster_plot.png', onLambda)
+    write_to_s3(job_id, S3_BUCKET, 'cluster_plot.png', onLambda)
     return response
 
-def plot_correlation(job_id):
+def plot_correlation(job_id, onLambda=True):
     """
     Generate the Correlation heat map as a PNG
     Parameters
@@ -113,8 +132,8 @@ def plot_correlation(job_id):
     fig = plot_correlation_fig(data)
     correlation_plot = fig_to_png(fig)
     response = correlation_plot.getvalue()
-    with open('correlation_plot.png', 'wb') as ofile:
-        ofile.write(response)
+    write_to_local(response, job_id, 'correlation_plot.png', onLambda)
+    write_to_s3(job_id, S3_BUCKET, 'correlation_plot.png', onLambda)
     return response
 
 def fig_to_png(fig):
@@ -341,12 +360,12 @@ def lambda_handler(event, context):
         else:
             min_members = event['min_members']
         plot_cluster(job_id, x_axis, y_axis, show_ticks, min_members)
-    elif plot == 'plot_correlation':
+    elif plot == 'correlation':
         plot_correlation(job_id)
 
 if __name__ == '__main__':
     job_id = sys.argv[1]
-    plot_aic_bic(job_id)
-    plot_count(job_id)
-    plot_cluster(job_id, 'Dimension 1', 'Dimension 2', True)
-    plot_correlation(job_id)
+    plot_aic_bic(job_id, onLambda=False)
+    plot_count(job_id, onLambda=False)
+    plot_cluster(job_id, 'Dimension 1', 'Dimension 2', True, onLambda=False)
+    plot_correlation(job_id, onLambda=False)
