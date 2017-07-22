@@ -21,8 +21,9 @@ You will get 3 zip files: `create_job.zip`, `fetch_tasks.zip`, and `worker.zip`.
 ### Create S3 bucket
 ![Create S3 bucket](doc/1.png)
 
-### Upload worker.zip to S3 bucket
-![Upload worker.zip to S3 bucket](doc/2.png)
+### Upload zip files to S3 bucket
+Upload `worker.zip` and `report.zip` to S3 bucket
+![Upload zip files to S3 bucket](doc/2.png)
 
 ### Create SNS topic
 ![Create SNS topic](doc/3.png)
@@ -61,6 +62,17 @@ Use `worker.zip` in S3 bucket as source code.
 Also, in advanced settings increase the timeout to avoid lambda function not able to finish the task.
 
 ![worker](doc/7.png)
+
+Upload `report.zip` as source code.
+
+* Runtime: Python 3.6
+* Environment variables: {"DYNAMO_DBNAME": "*your dynamoDB table name*", "S3_BUCKET": "*your S3 bucket name*"}
+* Handler: report.lambda_handler
+* Role: A role can listen to DynamoDB Stream and publish to SNS topic
+
+Consider to increase the timeout to avoid lambda function not able to finish the task.
+
+![report](doc/10.png)
 
 ## Test
 

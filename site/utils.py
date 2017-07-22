@@ -5,6 +5,7 @@ Author: Angad Gill, Wei-Tsung Lin
 """
 import os
 import csv
+import time
 import boto3
 import shutil
 
@@ -77,3 +78,41 @@ def unmarshalDynamoValue(node, mapAsObject):
                 return data
         elif key == 'BOOL':
             return value
+
+def format_date_time(epoch_time):
+    """
+    Converts epoch time string to (Date, Time) formatted as ('04 April 2017', '11:01 AM').
+    Parameters
+    ----------
+    epoch_time: str
+        Epoch time converted to str.
+    Returns
+    -------
+    (str, str)
+        (Date, Time) formatted as ('04 April 2017', '11:01 AM')
+    """
+    start_time = time.localtime(float(epoch_time))
+    start_time_date = time.strftime("%d %B %Y", start_time)
+    start_time_clock = time.strftime("%I:%M %p", start_time)
+    return start_time_date, start_time_clock
+
+
+def filter_dict_list_by_keys(dict_list, keys):
+    """
+    Keep only keys specified in the function parameter `keys`. Does not modify dicts in `dict_list`.
+    Parameters
+    ----------
+    dict_list: list(dict)
+    keys: list(str)
+    Returns
+    -------
+    list(dict)
+    """
+    new_dict_list = []
+    for d in dict_list:
+        new_d = {}
+        for k, v in d.items():
+            if k in keys:
+                new_d[k] = v
+        new_dict_list += [new_d]
+    return new_dict_list

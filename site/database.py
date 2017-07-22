@@ -7,8 +7,27 @@ import os
 import time
 import uuid
 import boto3
+from boto3.dynamodb.conditions import Key
 
 DYNAMO_DBNAME = os.environ['DYNAMO_DBNAME']
+
+def dynamo_get_tasks(job_id):
+    """
+    Get job object from DynamoDB.
+    Parameters
+    ----------
+    job_id: str
+    Returns
+    -------
+    dict
+        Job object
+    """
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(DYNAMO_DBNAME)
+    items = table.query(
+        KeyConditionExpression=Key('job_id').eq(job_id)
+    )['Items']
+    return items
 
 def dynamo_no_context_add_tasks(tasks):
     """

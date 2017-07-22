@@ -4,7 +4,8 @@ Author: Angad Gill, Wei-Tsung Lin
 import uuid
 import sys
 import csv
-from utils import read_csv, col_select
+import time
+from utils import read_csv, col_select, float_to_str
 from database import dynamo_no_context_add_tasks
 
 def lambda_handler(event, context):
@@ -57,6 +58,7 @@ def create_tasks(job_id, n_init, n_experiments, max_k, covars, columns, s3_file_
     None
     """
     task_status = 'pending'
+    created_time = float_to_str(time.time())
 
     # Add tasks to DynamoDB
     task_id = 0
@@ -75,7 +77,8 @@ def create_tasks(job_id, n_init, n_experiments, max_k, covars, columns, s3_file_
                     s3_file_key = s3_file_key,
                     columns = columns,
                     scale = scale,
-                    task_status = task_status)
+                    task_status = task_status,
+                    created_time = created_time)
                 tasks += [task]
                 task_id += 1
     dynamo_no_context_add_tasks(tasks)
@@ -84,6 +87,6 @@ def create_tasks(job_id, n_init, n_experiments, max_k, covars, columns, s3_file_
 if __name__ == '__main__':
     s3_file_key = sys.argv[1]
 
-    covars = ['full-tied']
+    covars = ["full-tied", "full-untied", "diag-tied", "diag-untied", "spher-tied", "spher-untied"]
     columns = ['Dimension 1', 'Dimension 2']
-    submit(1, 1, 1, covars, columns, True, s3_file_key)
+    submit(1, 3, 1, covars, columns, True, s3_file_key)

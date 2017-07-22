@@ -1,6 +1,9 @@
 
 #!/bin/bash
 
+# pkgs=venv/lib/python3.6/site-packages/
+pkgs=pkgs
+
 # create_job.lambda_handler
 rm -f create_job.zip
 zip -r9 create_job.zip create_job.py utils.py database.py
@@ -14,6 +17,16 @@ echo 'fetch_tasks.lambda_handler'
 # worker.lambda_handler
 rm -f worker.zip
 zip -r9 worker.zip worker.py sklearn_lite.py database.py utils.py sf_kmeans/sf_kmeans.py
-cd venv/lib/python3.6/site-packages/
-zip -ur ../../../../worker.zip scipy/ numpy/
+current_path=$PWD
+cd $pkgs
+zip -ur $current_path/worker.zip scipy/ numpy/
+cd $current_path
 echo 'worker.lambda_handler'
+
+# report.lambda_handler
+rm -f report.zip
+zip -r9 report.zip report.py utils.py database.py
+current_path=$PWD
+cd $pkgs
+zip -ur $current_path/report.zip pandas/ pytz/ numpy/
+cd $current_path
