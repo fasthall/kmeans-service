@@ -364,8 +364,13 @@ def lambda_handler(event, context):
         plot_correlation(job_id)
 
 if __name__ == '__main__':
-    job_id = sys.argv[1]
-    plot_aic_bic(job_id, onLambda=False)
-    plot_count(job_id, onLambda=False)
-    plot_cluster(job_id, 'Dimension 1', 'Dimension 2', True, onLambda=False)
-    plot_correlation(job_id, onLambda=False)
+    plot_type = sys.argv[1]
+    job_id = sys.argv[2]
+    if plot_type == 'aic_bic':
+        plot_aic_bic(job_id, onLambda=False)
+    elif plot_type == 'count':
+        plot_count(job_id, onLambda=False)
+    elif plot_type == 'cluster':
+        plot_cluster(job_id, 'Dimension 1', 'Dimension 2', True, onLambda=False)
+    elif plot_type == 'correlation':
+        plot_correlation(job_id, onLambda=False)

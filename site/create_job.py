@@ -1,14 +1,29 @@
 """
 Author: Angad Gill, Wei-Tsung Lin
 """
+import os
 import uuid
 import sys
 import csv
 import time
+import gochariots
+import json
+import random
 from utils import read_csv, col_select, float_to_str
 from database import dynamo_no_context_add_tasks
 
 def lambda_handler(event, context):
+    seed = random.getrandbits(64)
+    gochariots.setHost(os.environ['GOCHARIOTS_HOST'])
+    print('host', os.environ['GOCHARIOTS_HOST'])
+
+    payload = {'action': 'create_job', 'event': event}
+    record = gochariots.Record(seed)
+    record.add('kmeans', json.dumps(payload))
+    hash = gochariots.getHash(record)[0]
+    response = gochariots.post(record)
+    print(response, seed, hash)
+
     if 'n_init' not in event:
         return 'n_init needed'
     if 'n_exp' not in event:
@@ -30,14 +45,14 @@ def lambda_handler(event, context):
     columns = event['columns']
     scale = event['scale']
     s3_file_key = event['s3_file_key']
-    return submit(n_init, n_exp, max_k, covars, columns, scale, s3_file_key)
+    return submit(n_init, n_exp, max_k, covars, columns, scale, s3_file_key, seed, hash)
 
-def submit(n_init, n_exp, max_k, covars, columns, scale, s3_file_key):
+def submit(n_init, n_exp, max_k, covars, columns, scale, s3_file_key, seed, hash):
     job_id = str(uuid.uuid4())
-    create_tasks(job_id, n_init, n_exp, max_k, covars, columns, s3_file_key, scale)
+    create_tasks(job_id, n_init, n_exp, max_k, covars, columns, s3_file_key, scale, seed, hash)
     return job_id
 
-def create_tasks(job_id, n_init, n_experiments, max_k, covars, columns, s3_file_key, scale):
+def create_tasks(job_id, n_init, n_experiments, max_k, covars, columns, s3_file_key, scale, seed, hash):
     """
     Creates all the tasks needed to complete a job. Adds database entries for each task and triggers an asynchronous
     functions to process the task.
@@ -78,7 +93,9 @@ def create_tasks(job_id, n_init, n_experiments, max_k, covars, columns, s3_file_
                     columns = columns,
                     scale = scale,
                     task_status = task_status,
-                    created_time = created_time)
+                    created_time = created_time,
+                    seed = seed,
+                    hash = hash)
                 tasks += [task]
                 task_id += 1
     dynamo_no_context_add_tasks(tasks)

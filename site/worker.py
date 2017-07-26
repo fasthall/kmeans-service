@@ -4,6 +4,7 @@ Author: Angad Gill, Wei-Tsung Lin
 import os
 import time
 import json
+import gochariots
 import sklearn_lite as preprocessing
 from utils import *
 from database import *
@@ -12,8 +13,18 @@ from sf_kmeans import sf_kmeans
 S3_BUCKET = os.environ['S3_BUCKET']
 
 def lambda_handler(event, context):
+    gochariots.setHost(os.environ['GOCHARIOTS_HOST'])
+
     message = event['Records'][0]['Sns']['Message']
     task = json.loads(message)
+
+    payload = {'action': 'worker', 'event': event}
+    record = gochariots.Record(task['seed'])
+    record.add('kmeans', json.dumps(payload))
+    record.setHash(task['hash'])
+    response = gochariots.post(record)
+    print(response, task['seed'], task['hash'])
+
     job_id = task['job_id']
     task_id = task['task_id']
     k = task['k']
@@ -44,8 +55,10 @@ def run_kmeans(data, n_clusters, covar_type, covar_tied, n_init):
     float, float, list(int)
         aic, bic, labels
     """
+    # kmeans = sf_kmeans.SF_KMeans(n_clusters=n_clusters, covar_type=covar_type, covar_tied=covar_tied, n_init=n_init,
+    #                              verbose=0)
     kmeans = sf_kmeans.SF_KMeans(n_clusters=n_clusters, covar_type=covar_type, covar_tied=covar_tied, n_init=n_init,
-                                 verbose=0)
+                                 verbose=0, tol=0.001, max_iter=100)
     kmeans.fit(data)
     aic, bic = kmeans.aic(data), kmeans.bic(data)
     labels = [int(l) for l in kmeans.labels_]
@@ -76,7 +89,8 @@ def work_task(job_id, task_id, k, covar_type, covar_tied, n_init, s3_file_key, c
         'Done'
     """
     try:
-        print('job_id:{}, task_id:{}'.format(job_id, task_id))
+        # print('job_id:{}, task_id:{}'.format(job_id, task_id))
+        print("start: ", task_id)
         start_time = time.time()
         start_read_time = time.time()
         data, attr = read_from_s3(job_id, task_id, S3_BUCKET, s3_file_key)
@@ -94,6 +108,7 @@ def work_task(job_id, task_id, k, covar_type, covar_tied, n_init, s3_file_key, c
         elapsed_time = float_to_str(elapsed_time)
         elapsed_read_time = float_to_str(elapsed_read_time)
         elapsed_processing_time = float_to_str(elapsed_processing_time)
+        print("finish: ", task_id)
         response = dynamo_no_context_update_task(job_id, task_id, aic, bic, labels, elapsed_time, elapsed_read_time, elapsed_processing_time)
     except Exception as e:
         response = dynamo_no_context_update_task_status(job_id, task_id, 'error')
