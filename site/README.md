@@ -16,6 +16,7 @@ The libraries plot needs are too large and can't fit in a single zip file that A
 - Connect to EC2 instance and run 
 
 ```bash
+$ sudo yum -y groupinstall "Development Tools"
 $ git clone https://github.com/fasthall/kmeans-service.git
 $ cd kmeans-service/site
 $ sh build.sh

@@ -3,7 +3,6 @@
 cd ~
 sudo yum -y update
 sudo yum -y upgrade
-sudo yum -y groupinstall "Development Tools"
 sudo yum -y install blas --enablerepo=epel
 sudo yum -y install lapack --enablerepo=epel
 sudo yum -y install Cython --enablerepo=epel
