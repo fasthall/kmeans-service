@@ -1,7 +1,7 @@
 # Centaurus: K-Means as a Service
 This is the AWS Lambda port of Centaurus.
 
-Author: Angad Gill, Wei-Tsung Lin
+Author: Angad Gill, Wei-Tsung Lin, Michael Zhang
 
 ## TODO
 The libraries plot needs are too large and can't fit in a single zip file that AWS Lambda accepts.
@@ -12,20 +12,22 @@ The libraries plot needs are too large and can't fit in a single zip file that A
 
 **DISCLAMIER** This application uses part of `sklearn`. Because putting all required libraries into zip file may exceed AWS Lambda's limit, so the necessary functions in sklearn is moved to sklearn_lite.py. The package is distributed under 3-Clause BSD license.
 
-    $ virtualenv venv --python=python3
-    $ source venv/bin/activate
-    (venv) $ pip install --no-binary --no-compile scipy==0.19.0
-    (venv) $ pip install --no-binary --no-compile numpy==1.12.1
-    $ sh build_zip.sh
-If your virtualenv's packages location is not `venv/lib/python3.6/site-packages/`, remember to change it in `build_zip.sh`.
+- Launch a t2.micro EC2 instance of `Amazon Linux AMI 2018.03.0 (HVM), SSD Volume Type - ami-a0cfeed8` (free-tier) on AWS to build zip file.
+- Connect to EC2 instance and run 
 
-You will get 3 zip files: `create_job.zip`, `fetch_tasks.zip`, and `worker.zip`.
+```bash
+$ git clone https://github.com/fasthall/kmeans-service.git
+$ cd kmeans-service/site
+$ sh build.sh
+```
+You will get 5 zip files: `create_job.zip`, `fetch_tasks.zip`, `worker.zip`, `record.zip`, `plot.zip`.
 
 ### Create S3 bucket
 ![Create S3 bucket](doc/1.png)
 
 ### Upload zip files to S3 bucket
-Upload `worker.zip`, `report.zip` and `plot.zip` to S3 bucket
+- Upload 5 zip files and `normal.csv` to S3 bucket
+
 ![Upload zip files to S3 bucket](doc/2.png)
 
 ### Create SNS topic
@@ -51,6 +53,7 @@ Upload `fetch_task.zip` as source code.
 * Environment variables: {"SNS_TOPIC_ARN": "*your SNS topic arn*"}
 * Handler: fetch_task.lambda_handler
 * Role: A role can listen to DynamoDB Stream and publish to SNS topic
+* **Add a trigger of DynamoDB** on `fetch_tasks`
 
 ![fetch_task](doc/6.png)
 
@@ -61,8 +64,8 @@ Use `worker.zip` in S3 bucket as source code.
 * Environment variables: {"DYNAMO_DBNAME": "*your dynamoDB table name*", "S3_BUCKET": "*your S3 bucket name*"}
 * Handler: worker.lambda_handler
 * Role: A role can listen to SNS topic and write to DynamoDB
-
-Also, in advanced settings increase the timeout to avoid lambda function not able to finish the task.
+* **Add a trigger of SNS** on `worker`
+* Increase the timeout to 10 seconds to avoid lambda function not able to finish the task.
 
 ![worker](doc/7.png)
 
@@ -72,8 +75,7 @@ Upload `report.zip` as source code.
 * Environment variables: {"DYNAMO_DBNAME": "*your dynamoDB table name*", "S3_BUCKET": "*your S3 bucket name*"}
 * Handler: report.lambda_handler
 * Role: A role can listen to DynamoDB Stream and publish to SNS topic
-
-Consider to increase the timeout to avoid lambda function not able to finish the task.
+* Increase the timeout to 10 seconds to avoid lambda function not able to finish the task.
 
 ![report](doc/10.png)
 
@@ -84,8 +86,7 @@ Use `plot.zip` in S3 bucket as source code.
 * Environment variables: {"DYNAMO_DBNAME": "*your dynamoDB table name*", "S3_BUCKET": "*your S3 bucket name*"}
 * Handler: plot.lambda_handler
 * Role: A role can read from S3 and write to DynamoDB
-
-Also, in advanced settings increase the timeout to avoid lambda function not able to finish the task.
+* Increase the timeout to 10 seconds to avoid lambda function not able to finish the task.
 
 ![report](doc/11.png)
 
