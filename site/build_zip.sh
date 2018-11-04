@@ -43,6 +43,8 @@ zip -r9 report.zip report.py utils.py database.py
 current_path=$PWD
 cd $pkgs1
 zip -ur $current_path/report.zip pandas/ numpy/ pytz/
+cd $pkgs2
+zip -ur $current_path/report.zip pytz/
 # cd $pkgs3
 # zip -ur $current_path/report.zip 
 cd $current_path
