@@ -27,7 +27,8 @@ def read_from_s3_pd(job_id, task_id, bucket, key):
 def write_to_local(data, job_id, file, onLambda=True):
     if onLambda:
         path = '/tmp/' + str(job_id) + '/'
-        os.makedirs(path)
+        if not os.path.exists(path):
+            os.makedirs(path)
     else:
         path = './imgs/'
         if not os.path.exists(path):
