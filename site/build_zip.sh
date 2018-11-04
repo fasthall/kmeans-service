@@ -42,9 +42,9 @@ rm -f report.zip
 zip -r9 report.zip report.py utils.py database.py
 current_path=$PWD
 cd $pkgs1
-zip -ur $current_path/report.zip pandas/ numpy/
-cd $pkgs3
-zip -ur $current_path/report.zip pytz/
+zip -ur $current_path/report.zip pandas/ numpy/ pytz/
+# cd $pkgs3
+# zip -ur $current_path/report.zip 
 cd $current_path
 echo 'report.lambda_handler'
 
@@ -53,10 +53,10 @@ rm -f plot.zip
 zip -r9 plot.zip plot.py utils.py database.py
 current_path=$PWD
 cd $pkgs1
-zip -ur $current_path/plot.zip pandas/ numpy/ matplotlib/
+zip -ur $current_path/plot.zip pandas/ numpy/ matplotlib/ scipy/ kiwisolver/
 cd $pkgs2
-zip -ur $current_path/plot.zip pyparsing.py cycler.py
-cd $pkgs3
-zip -ur $current_path/plot.zip pytz/ seaborn/
+zip -ur $current_path/plot.zip pyparsing.py cycler.py pytz/ seaborn/
+# cd $pkgs3
+# zip -ur $current_path/plot.zip 
 cd $current_path
 echo 'plot.lambda_handler'
