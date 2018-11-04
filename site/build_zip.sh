@@ -55,7 +55,7 @@ rm -f plot.zip
 zip -r9 plot.zip plot.py utils.py database.py
 current_path=$PWD
 cd $pkgs1
-zip -ur $current_path/plot.zip pandas/ numpy/ matplotlib/ scipy/ kiwisolver/
+zip -ur $current_path/plot.zip pandas/ numpy/ matplotlib/ scipy/ kiwisolver.cpython-36m-x86_64-linux-gnu.so
 cd $pkgs2
 zip -ur $current_path/plot.zip pyparsing.py cycler.py pytz/ seaborn/
 # cd $pkgs3
