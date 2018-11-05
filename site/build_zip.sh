@@ -14,6 +14,7 @@ source venv/bin/activate
 pip install -r ./requirements.txt
 
 pkgs1=~/kmeans-service/site/venv/lib64/python3.6/dist-packages/
+pkgs4=~/kmeans-service/site/venv/lib64/python3.6/site-packages/
 pkgs2=~/kmeans-service/site/venv/lib/python3.6/site-packages/
 pkgs3=~/kmeans-service/site/venv/lib/python3.6/dist-packages/
 # pkgs=pkgs
@@ -34,6 +35,10 @@ zip -r9 worker.zip worker.py sklearn_lite.py database.py utils.py sf_kmeans/sf_k
 current_path=$PWD
 cd $pkgs1
 zip -ur $current_path/worker.zip scipy/ numpy/ flask/
+cd $pkgs4
+zip -ur $current_path/worker.zip pandas/
+cd $pkgs3
+zip -ur $current_path/worker.zip werkzeug/
 cd $current_path
 echo 'worker.lambda_handler'
 
