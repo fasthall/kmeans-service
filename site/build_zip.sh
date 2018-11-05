@@ -11,7 +11,7 @@ sudo yum install python36-devel python36-pip gcc
 cd kmeans-service/site
 virtualenv venv --python=python3
 source venv/bin/activate
-pip install numpy scipy pytz matplotlib seaborn
+pip install -r ./requirements.txt
 
 pkgs1=~/kmeans-service/site/venv/lib64/python3.6/site-packages/
 pkgs2=~/kmeans-service/site/venv/lib/python3.6/site-packages/
@@ -33,30 +33,30 @@ rm -f worker.zip
 zip -r9 worker.zip worker.py sklearn_lite.py database.py utils.py sf_kmeans/sf_kmeans.py flask_app.py models.py
 current_path=$PWD
 cd $pkgs1
-zip -ur $current_path/worker.zip scipy/ numpy/
+zip -ur $current_path/worker.zip scipy/ numpy/ flask/
 cd $current_path
 echo 'worker.lambda_handler'
 
-# report.lambda_handler
-rm -f report.zip
-zip -r9 report.zip report.py utils.py database.py
-current_path=$PWD
-cd $pkgs1
-zip -ur $current_path/report.zip pandas/ numpy/
-cd $pkgs3
-zip -ur $current_path/report.zip pytz/
-cd $current_path
-echo 'report.lambda_handler'
+# # report.lambda_handler
+# rm -f report.zip
+# zip -r9 report.zip report.py utils.py database.py
+# current_path=$PWD
+# cd $pkgs1
+# zip -ur $current_path/report.zip pandas/ numpy/
+# cd $pkgs3
+# zip -ur $current_path/report.zip pytz/
+# cd $current_path
+# echo 'report.lambda_handler'
 
-# plot.lambda_handler
-rm -f plot.zip
-zip -r9 plot.zip plot.py utils.py database.py
-current_path=$PWD
-cd $pkgs1
-zip -ur $current_path/plot.zip pandas/ numpy/ matplotlib/
-cd $pkgs2
-zip -ur $current_path/plot.zip pyparsing.py cycler.py
-cd $pkgs3
-zip -ur $current_path/plot.zip pytz/ seaborn/
-cd $current_path
-echo 'plot.lambda_handler'
+# # plot.lambda_handler
+# rm -f plot.zip
+# zip -r9 plot.zip plot.py utils.py database.py
+# current_path=$PWD
+# cd $pkgs1
+# zip -ur $current_path/plot.zip pandas/ numpy/ matplotlib/
+# cd $pkgs2
+# zip -ur $current_path/plot.zip pyparsing.py cycler.py
+# cd $pkgs3
+# zip -ur $current_path/plot.zip pytz/ seaborn/
+# cd $current_path
+# echo 'plot.lambda_handler'
