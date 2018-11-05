@@ -38,6 +38,7 @@ class SF_KMeans(object):
         self.best_inertia_ = None
         self.inertias_ = []
         self.log_likelihoods_ = []
+        self.iteration_num = self.max_iter
 
     def fit(self, data):
         """

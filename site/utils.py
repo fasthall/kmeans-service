@@ -116,3 +116,34 @@ def filter_dict_list_by_keys(dict_list, keys):
                 new_d[k] = v
         new_dict_list += [new_d]
     return new_dict_list
+
+def s3_to_df(s3_file_key):
+    """
+    Downloads file from S3 and converts it to a Pandas DataFrame. Deletes the file from local disk when done.
+
+    Parameters
+    ----------
+    s3_file_key: str
+        Eucalyptus S3 file key
+
+    Returns
+    -------
+    Pandas DataFrame
+    """
+    # Add random number to file name to avoid collisions with other processes on the same machine
+    filename = '/tmp/{}_{}'.format(s3_file_key.replace('/', '_'), random.randint(1, 1e6))
+
+    """ Amazon S3 code """
+    s3 = boto3.client('s3')
+    s3.download_file(S3_BUCKET, s3_file_key, filename)
+
+    """ Eucalyptus S3 code """
+    # s3conn = boto.connect_walrus(aws_access_key_id=EUCA_KEY_ID, aws_secret_access_key=EUCA_SECRET_KEY, is_secure=False,
+    #                              port=8773, path=EUCA_S3_PATH, host=EUCA_S3_HOST)
+    # euca_bucket = s3conn.get_bucket(S3_BUCKET)
+    # k = boto.s3.key.Key(bucket=euca_bucket, name=s3_file_key)
+    # k.get_contents_to_filename(filename)
+
+    df = pd.read_csv(filename)
+    os.remove(filename)
+    return df
