@@ -13,7 +13,7 @@ virtualenv venv --python=python3
 source venv/bin/activate
 pip install -r ./requirements.txt
 
-pkgs1=~/kmeans-service/site/venv/lib64/python3.6/site-packages/
+pkgs1=~/kmeans-service/site/venv/lib64/python3.6/dist-packages/
 pkgs2=~/kmeans-service/site/venv/lib/python3.6/site-packages/
 pkgs3=~/kmeans-service/site/venv/lib/python3.6/dist-packages/
 # pkgs=pkgs
