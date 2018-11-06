@@ -30,26 +30,26 @@ zip -r9 fetch_tasks.zip fetch_tasks.py utils.py
 echo 'fetch_tasks.lambda_handler'
 
 # worker.lambda_handler
-rm -f worker.zip
-zip -r9 worker.zip worker.py sklearn_lite.py database.py utils.py sf_kmeans/sf_kmeans.py sqlalchemy_engine.py models_sqlalchemy.py config.py
-current_path=$PWD
-cd $pkgs1
-zip -ur $current_path/worker.zip scipy/ numpy/ sqlalchemy/
-cd $pkgs2
-zip -ur $current_path/worker.zip pytz/
-cd $pkgs4
-zip -ur $current_path/worker.zip pandas/
-# cd $pkgs3
-# zip -ur $current_path/worker.zip werkzeug/ jinja2/ itsdangerous/ s3transfer/
-cd $current_path
-echo 'worker.lambda_handler'
+# rm -f worker.zip
+# zip -r9 worker.zip worker.py sklearn_lite.py database.py utils.py sf_kmeans/sf_kmeans.py config.py
+# current_path=$PWD
+# cd $pkgs1
+# zip -ur $current_path/worker.zip scipy/ numpy/
+# cd $pkgs2
+# zip -ur $current_path/worker.zip pytz/
+# cd $pkgs4
+# zip -ur $current_path/worker.zip pandas/
+# # cd $pkgs3
+# # zip -ur $current_path/worker.zip werkzeug/ jinja2/ itsdangerous/ s3transfer/
+# cd $current_path
+# echo 'worker.lambda_handler'
 
 # db_writer.lambda_handler
 rm -f db_writer.zip
 zip -r9 db_writer.zip db_writer.py sqlalchemy_engine.py models_sqlalchemy.py config.py
 current_path=$PWD
 cd $pkgs1
-zip -ur $current_path/db_writer.zip sqlalchemy/
+zip -ur $current_path/db_writer.zip sqlalchemy/ psycopg2/
 cd $current_path
 echo 'db_writer.lambda_handler'
 

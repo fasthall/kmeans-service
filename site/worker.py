@@ -112,4 +112,4 @@ def work_task(job_id, task_id, k, covar_type, covar_tied, n_init, s3_file_key, c
         Payload = json_result
     )
 
-    return response.StatusCode
+    return response['StatusCode']
