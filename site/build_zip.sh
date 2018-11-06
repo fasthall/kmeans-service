@@ -31,16 +31,16 @@ echo 'fetch_tasks.lambda_handler'
 
 # worker.lambda_handler
 rm -f worker.zip
-zip -r9 worker.zip worker.py sklearn_lite.py database.py utils.py sf_kmeans/sf_kmeans.py flask_app.py models.py config.py
+zip -r9 worker.zip worker.py sklearn_lite.py database.py utils.py sf_kmeans/sf_kmeans.py sqlalchemy_engine.py models_sqlalchemy.py config.py
 current_path=$PWD
 cd $pkgs1
-zip -ur $current_path/worker.zip scipy/ numpy/ flask/ flask_sqlalchemy/ click/ markupsafe/ sqlalchemy/
+zip -ur $current_path/worker.zip scipy/ numpy/ sqlalchemy/
 cd $pkgs2
 zip -ur $current_path/worker.zip pytz/
 cd $pkgs4
 zip -ur $current_path/worker.zip pandas/
-cd $pkgs3
-zip -ur $current_path/worker.zip werkzeug/ jinja2/ itsdangerous/ s3transfer/
+# cd $pkgs3
+# zip -ur $current_path/worker.zip werkzeug/ jinja2/ itsdangerous/ s3transfer/
 cd $current_path
 echo 'worker.lambda_handler'
 

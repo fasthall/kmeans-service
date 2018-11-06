@@ -7,7 +7,7 @@ import numpy as np
 import sklearn_lite as preprocessing
 from utils import *
 from models import Job, Task
-from flask_app import db
+from sqlalchemy_engine import session
 from sf_kmeans import sf_kmeans
 
 S3_BUCKET = os.environ['S3_BUCKET']
@@ -98,7 +98,7 @@ def work_task(job_id, task_id, k, covar_type, covar_tied, n_init, s3_file_key, c
         cluster_counts = (np.sort(np.bincount(labels))[::-1]).tolist()
         cluster_count_minimum = int(np.min(cluster_counts))
 
-        db.session.query(Task).filter_by(job_id=job_id, task_id=task_id).update(
+        session.query(Task).filter_by(job_id=job_id, task_id=task_id).update(
             dict(
                 task_status='done', aic=aic, bic=bic, labels=labels,
                 iteration_num=iteration_num, centers=((centers).tolist()),
@@ -106,12 +106,12 @@ def work_task(job_id, task_id, k, covar_type, covar_tied, n_init, s3_file_key, c
                 elapsed_processing_time=elapsed_processing_time,
                 cluster_counts=cluster_counts,
                 cluster_count_minimum=cluster_count_minimum))
-        db.session.commit()
+        session.commit()
         total_time = (datetime.utcnow() - start_time).total_seconds()
         print("Time stamp : {}".format(datetime.utcnow()))
         print('total time : {}'.format(total_time))
     except Exception as e:
-        db.session.query(Task).filter_by(job_id=job_id,
+        session.query(Task).filter_by(job_id=job_id,
                                      task_id=task_id).update(
             task_status='error')
         raise e
