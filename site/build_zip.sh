@@ -44,6 +44,15 @@ zip -ur $current_path/worker.zip pandas/
 cd $current_path
 echo 'worker.lambda_handler'
 
+# db_writer.lambda_handler
+rm -f db_writer.zip
+zip -r9 db_writer.zip db_writer.py sqlalchemy_engine.py models_sqlalchemy.py config.py
+current_path=$PWD
+cd $pkgs1
+zip -ur $current_path/db_writer.zip sqlalchemy/
+cd $current_path
+echo 'db_writer.lambda_handler'
+
 # # report.lambda_handler
 # rm -f report.zip
 # zip -r9 report.zip report.py utils.py database.py

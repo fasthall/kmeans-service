@@ -1,13 +1,11 @@
 """
 Author: Angad Gill, Wei-Tsung Lin
 """
-import os, time, json
+import os, time, json, boto3
 from datetime import datetime
 import numpy as np
 import sklearn_lite as preprocessing
-from utils import *
-from models import Job, Task
-from sqlalchemy_engine import session
+from utils import s3_to_df
 from sf_kmeans import sf_kmeans
 
 S3_BUCKET = os.environ['S3_BUCKET']
@@ -76,43 +74,42 @@ def work_task(job_id, task_id, k, covar_type, covar_tied, n_init, s3_file_key, c
     Returns
     -------
     str
-        'Done'
+        Status Code 
     """
-    try:
-        print(' working on: job_id:{}, task_id:{}'.format(job_id, task_id))
-        start_time = datetime.utcnow()
-        data = s3_to_df(s3_file_key)
-        elapsed_read_time = (datetime.utcnow() - start_time).total_seconds()
-        start_processing_time = datetime.utcnow()
-        data = data.loc[:, columns]
-        if scale:
-            data = preprocessing.scale(data)
 
-        aic, bic, labels, iteration_num, centers = run_kmeans(data, k,
-            covar_type, covar_tied, n_init)
+    start_time = datetime.utcnow()
+    data = s3_to_df(s3_file_key)
+    elapsed_read_time = (datetime.utcnow() - start_time).total_seconds()
+    start_processing_time = datetime.utcnow()
+    data = data.loc[:, columns]
+    if scale:
+        data = preprocessing.scale(data)
 
-        elapsed_processing_time = (datetime.utcnow() -
-                                   start_processing_time).total_seconds()
-        elapsed_time = (datetime.utcnow() - start_time).total_seconds()
-        elapsed_processing_time = elapsed_processing_time
-        cluster_counts = (np.sort(np.bincount(labels))[::-1]).tolist()
-        cluster_count_minimum = int(np.min(cluster_counts))
+    aic, bic, labels, iteration_num, centers = run_kmeans(data, k,
+        covar_type, covar_tied, n_init)
 
-        session.query(Task).filter_by(job_id=job_id, task_id=task_id).update(
-            dict(
-                task_status='done', aic=aic, bic=bic, labels=labels,
-                iteration_num=iteration_num, centers=((centers).tolist()),
-                elapsed_time=elapsed_time, elapsed_read_time=elapsed_read_time,
-                elapsed_processing_time=elapsed_processing_time,
-                cluster_counts=cluster_counts,
-                cluster_count_minimum=cluster_count_minimum))
-        session.commit()
-        total_time = (datetime.utcnow() - start_time).total_seconds()
-        print("Time stamp : {}".format(datetime.utcnow()))
-        print('total time : {}'.format(total_time))
-    except Exception as e:
-        session.query(Task).filter_by(job_id=job_id,
-                                     task_id=task_id).update(
-            task_status='error')
-        raise e
-    return 'Done'
+    elapsed_processing_time = (datetime.utcnow() -
+                                start_processing_time).total_seconds()
+    elapsed_time = (datetime.utcnow() - start_time).total_seconds()
+    elapsed_processing_time = elapsed_processing_time
+    cluster_counts = (np.sort(np.bincount(labels))[::-1]).tolist()
+    cluster_count_minimum = int(np.min(cluster_counts))
+    json_result = json.dumps({
+        'job_id':job_id, 'task_id':task_id, 
+        'db_obj':dict(
+            task_status='done', aic=aic, bic=bic, labels=labels,
+            iteration_num=iteration_num, centers=((centers).tolist()),
+            elapsed_time=elapsed_time, elapsed_read_time=elapsed_read_time,
+            elapsed_processing_time=elapsed_processing_time,
+            cluster_counts=cluster_counts,
+            cluster_count_minimum=cluster_count_minimum)
+    })
+    
+    client = boto3.client('lambda')
+    response = client.invoke(
+        FunctionName = 'db_writer',
+        InvocationType = 'Event',
+        Payload = json_result
+    )
+
+    return response.StatusCode
