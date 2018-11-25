@@ -1,4 +1,4 @@
-
+# This bash is for the lambda build-up on AWS EC2
 #!/bin/bash
 cd ~
 sudo yum -y update
