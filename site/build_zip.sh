@@ -30,19 +30,19 @@ zip -r9 fetch_tasks.zip fetch_tasks.py utils.py
 echo 'fetch_tasks.lambda_handler'
 
 # worker.lambda_handler
-# rm -f worker.zip
-# zip -r9 worker.zip worker.py sklearn_lite.py database.py utils.py sf_kmeans/sf_kmeans.py config.py
-# current_path=$PWD
+rm -f worker.zip
+zip -r9 worker.zip worker.py sklearn_lite.py database.py utils.py sf_kmeans/sf_kmeans.py config.py
+current_path=$PWD
 # cd $pkgs1
 # zip -ur $current_path/worker.zip scipy/ numpy/
-# cd $pkgs2
-# zip -ur $current_path/worker.zip pytz/
-# cd $pkgs4
-# zip -ur $current_path/worker.zip pandas/
-# # cd $pkgs3
-# # zip -ur $current_path/worker.zip werkzeug/ jinja2/ itsdangerous/ s3transfer/
-# cd $current_path
-# echo 'worker.lambda_handler'
+cd $pkgs2
+zip -ur $current_path/worker.zip pytz/
+cd $pkgs4
+zip -ur $current_path/worker.zip pandas/
+# cd $pkgs3
+# zip -ur $current_path/worker.zip werkzeug/ jinja2/ itsdangerous/ s3transfer/
+cd $current_path
+echo 'worker.lambda_handler'
 
 # db_writer.lambda_handler
 rm -f db_writer.zip
@@ -76,3 +76,7 @@ echo 'db_writer.lambda_handler'
 # zip -ur $current_path/plot.zip pytz/ seaborn/
 # cd $current_path
 # echo 'plot.lambda_handler'
+
+aws s3api put-object --bucket kmeansservice-lambda --key worker.zip --body worker.zip
+aws s3api put-object --bucket kmeansservice-lambda --key writer.zip --body writer.zip
+echo 'Uploaded to s3 bucket'

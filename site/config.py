@@ -3,7 +3,7 @@ All global Python variables are in this file.
 
 Author: Angad Gill, Nevena Golubovic
 """
-S3_BUCKET = 'kmeansservice'
+S3_BUCKET = 'kmeansservice-lambda'
 EUCA_S3_HOST = "s3.cloud.aristotle.ucsb.edu"
 EUCA_S3_PATH = "/services/Walrus"
 UPLOAD_FOLDER = 'data'
