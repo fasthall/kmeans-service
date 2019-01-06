@@ -35,9 +35,9 @@ zip -r9 worker.zip worker.py sklearn_lite.py database.py utils.py sf_kmeans/sf_k
 current_path=$PWD
 # cd $pkgs1
 # zip -ur $current_path/worker.zip scipy/ numpy/
-cd $pkgs2
+cd $pkgs3
 zip -ur $current_path/worker.zip pytz/
-cd $pkgs4
+cd $pkgs1
 zip -ur $current_path/worker.zip pandas/
 # cd $pkgs3
 # zip -ur $current_path/worker.zip werkzeug/ jinja2/ itsdangerous/ s3transfer/
@@ -78,5 +78,5 @@ echo 'db_writer.lambda_handler'
 # echo 'plot.lambda_handler'
 
 aws s3api put-object --bucket kmeansservice-lambda --key worker.zip --body worker.zip
-aws s3api put-object --bucket kmeansservice-lambda --key writer.zip --body writer.zip
+aws s3api put-object --bucket kmeansservice-lambda --key db_writer.zip --body db_writer.zip
 echo 'Uploaded to s3 bucket'
